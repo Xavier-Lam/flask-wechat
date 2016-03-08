@@ -19,18 +19,15 @@ def subscribe(message):
 
 @wechat.message_handler("tmp")
 def all(message):
-    return quick_response("听不懂呢")
+    return message.reply_text("听不懂呢")
 
 @wechat.message_handler("tmp", filters.contains("妈个鸡"))
 def subscribe(message):
-    return quick_response("草泥马")
+    return message.reply_text("草泥马")
 
 @wechat.message_handler("tmp", filters.contains("受不了了"))
 def subscribe(message):
-    return quick_response("小妖精 看我不操烂你的逼")
-
-def quick_response(text):
-    return WeChatResponse(msgtype="text", content=text)
+    return message.reply_text("小妖精 看我不操烂你的逼")
 
 @app.route("/")
 def home():

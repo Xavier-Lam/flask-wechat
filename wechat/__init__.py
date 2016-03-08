@@ -4,28 +4,42 @@ from collections import defaultdict
 from functools import reduce, wraps
 from flask import Blueprint
 
-from .classes import *
 from .filters import all as filter_all
 from .filters import _combine_funcs
-from .signals import *
+
+
+def _patch():
+    def CDATA(text=None):
+        element = ElementTree.Element("![CDATA[")
+        element.text = text
+        return element
+
+    ElementTree.CDATA = CDATA
+
+    ElementTree._original_serialize_xml = ElementTree._serialize_xml
+    def _serialize_xml(write, elem, qnames, namespaces, *args, **kwargs):
+        if elem.tag == "![CDATA[":
+            write("\n<%s%s]]>\n" % (
+                    elem.tag, elem.text))
+            return
+        return ElementTree._original_serialize_xml(
+            write, elem, qnames, namespaces, *args, **kwargs)
+    ElementTree._serialize_xml = ElementTree._serialize['xml'] = _serialize_xml
+
+_patch()
+
 
 __all__ = ["WeChat", "wechat_blueprint"]
 
-__default_configs = dict(
+_default_configs = dict(
     WECHAT_CALLBACK_PREFIX="/wechat/callbacks",
 );
 
 def _get_app_config(app, key):
-    return app.config.get(key) or __default_configs[key]
-
-# def _combine_funcs(funcs, join_func=lambda a, b: a and b):
-#     def __call(*args, **kwargs):
-#         return reduce(lambda func_a, func_b:\
-#             join_func(func_a(*args, **kwargs), func_b(*args, **kwargs)),
-#             funcs)
-#     return __call
+    return app.config.get(key) or _default_configs[key]
 
 _callable = lambda func: hasattr(func, "__call__")
+
 
 class WeChatBlueprint(Blueprint):
     __core = None
@@ -41,6 +55,7 @@ class WeChatBlueprint(Blueprint):
 
 wechat_blueprint = WeChatBlueprint("wechat", __name__)
 
+
 class WeChat(object):
     def __init__(self, app=None):
         if app:
@@ -54,7 +69,7 @@ class WeChat(object):
         app.register_blueprint(wechat_blueprint, 
             url_prefix=_get_app_config(app, "WECHAT_CALLBACK_PREFIX"))
 
-        
+    #region account configs
     def config_getter(self, func):
         """
         设置获取微信配置的装饰器
@@ -63,9 +78,15 @@ class WeChat(object):
         self.__get_account_config = func
         return func
         
+    def get_config(name):
+        if not hasattr("__get_account_config"):
+            raise Exception("no config_getters registered")
+        return self.__get_account_config(identity)
+    #endregion
+        
     #region handlers
     _handlers = defaultdict(list)
-    def message_handler(self, identity="", filters=None):
+    def handler(self, identity="", filters=None):
         """
         注册消息处理器
         传入配置id 与filter 其中filter接收一个WeChatMessageBase类型传参
@@ -96,12 +117,14 @@ class WeChat(object):
         return decorator
 
     def handle_message(self, identity, message):
+        """处理消息"""
         handler = self.__get_handler(identity, message)
         if not handler:
             return None
         try:
             return handler(message)
         except Exception as e:
+            from .signals import response_error
             response_error.send(self, e)
             return None
         
@@ -114,7 +137,6 @@ class WeChat(object):
                 return handler
         return None
     #endregion
-
 
     #region interceptors
     _interceptors = dict()
