@@ -3,7 +3,7 @@
 from flask import abort, current_app, request, Response
 from . import signals
 from . import wechat_blueprint as wechat
-from .classes import WeChatMessageBase, WeChatResponse
+from .messages import WeChatMessageBase, WeChatResponse
 from .services.accesstoken import get_token
 
 @wechat.route("/<identify>/", methods=["GET"])

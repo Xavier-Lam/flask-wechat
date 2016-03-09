@@ -2,12 +2,15 @@
 
 from collections import defaultdict
 from functools import reduce, wraps
+from xml.etree import ElementTree
+
 from flask import Blueprint
 
 from .filters import all as filter_all
 from .filters import _combine_funcs
 
 
+#region patch
 def _patch():
     def CDATA(text=None):
         element = ElementTree.Element("![CDATA[")
@@ -27,20 +30,26 @@ def _patch():
     ElementTree._serialize_xml = ElementTree._serialize['xml'] = _serialize_xml
 
 _patch()
+#endregion
 
 
-__all__ = ["WeChat", "wechat_blueprint"]
+__all__ = ["WeChat", "wechat_blueprint", "WeChatClient", "WeChatHTTPClient"]
 
+
+#region configs
 _default_configs = dict(
     WECHAT_CALLBACK_PREFIX="/wechat/callbacks",
 );
 
 def _get_app_config(app, key):
     return app.config.get(key) or _default_configs[key]
+#endregion
+
 
 _callable = lambda func: hasattr(func, "__call__")
 
 
+#region blueprint
 class WeChatBlueprint(Blueprint):
     __core = None
     @property
@@ -54,6 +63,7 @@ class WeChatBlueprint(Blueprint):
         self.__core = value
 
 wechat_blueprint = WeChatBlueprint("wechat", __name__)
+#endregion
 
 
 class WeChat(object):
@@ -77,11 +87,27 @@ class WeChat(object):
         """
         self.__get_account_config = func
         return func
-        
-    def get_config(name):
-        if not hasattr("__get_account_config"):
+
+    def accesstoken(self, func):
+        """
+        获取或设置微信token
+        """
+        self.__accesstoken = func
+        return func
+    #endregion
+
+    #region module inner only
+    __get_account_config = None
+    def _get_config(self, identity):
+        if not self.__get_account_config:
             raise Exception("no config_getters registered")
         return self.__get_account_config(identity)
+
+    __accesstoken = None
+    def _accesstoken_maintainer(self, identity, value=""):
+        if not self.__accesstoken:
+            raise Exception("no accesstoken maintainer registered")
+        return self.__accesstoken(identity, value)
     #endregion
         
     #region handlers
@@ -170,3 +196,5 @@ class WeChat(object):
     #endregion
         
 from . import callback
+from .client import WeChatClient
+from .httpclient import WeChatHTTPClient

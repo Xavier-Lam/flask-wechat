@@ -1,6 +1,6 @@
 #encoding:utf8
 
-from .base import WeChatRequest
+from . import WeChatRequest
 
 class WeChatEvent(WeChatRequest):
     _allowed_keys = dict(WeChatRequest._allowed_keys, **dict(

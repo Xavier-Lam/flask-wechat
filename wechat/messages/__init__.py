@@ -62,7 +62,7 @@ class WeChatMessageBase(object):
             message = WeChatMessage(**params)
         return message
 
+from .response import WeChatResponse
+from .request import WeChatRequest
 from .event import WeChatEvent
 from .message import WeChatMessage
-from .request import WeChatRequest
-from .response import WeChatResponse

@@ -1,6 +1,6 @@
 #encoding:utf8
 
-from .base import WeChatMessageBase
+from . import WeChatMessageBase
 
 class WeChatResponse(WeChatMessageBase):
     _allowed_keys = dict(WeChatMessageBase._allowed_keys, **dict(
