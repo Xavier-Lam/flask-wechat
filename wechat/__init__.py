@@ -7,7 +7,7 @@ from xml.etree import ElementTree
 from flask import Blueprint
 
 from .filters import all as filter_all
-from .filters import _combine_funcs
+from .filters import and_
 
 
 #region patch
@@ -125,7 +125,7 @@ class WeChat(object):
                 if len(list(filter(lambda f: not _callable(f), filters))):
                     raise TypeError("filters must be callable")
                 # 合并过滤器
-                filters = _combine_funcs(filters)
+                filters = and_(filters)
             elif not _callable(filters):
                 raise TypeError("filters must be callable")
 

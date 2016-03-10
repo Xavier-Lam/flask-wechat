@@ -6,6 +6,7 @@ class WeChatEvent(WeChatRequest):
     _allowed_keys = dict(WeChatRequest._allowed_keys, **dict(
         Event=str,
         EventKey=str,
+        Ticket=str
     ))
 
     _event = None
