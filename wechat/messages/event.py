@@ -3,7 +3,7 @@
 from . import WeChatRequest
 
 class WeChatEvent(WeChatRequest):
-    _allowed_keys = dict(WeChatRequest._allowed_keys, **dict(
+    __slots__ = dict(WeChatRequest.__slots__, **dict(
         Event=str,
         EventKey=str,
         Ticket=str
@@ -18,3 +18,6 @@ class WeChatEvent(WeChatRequest):
     @event.setter
     def event(self, value):
         self._event = value
+        
+    def __repr__(self):
+        return "<%s %s %s>"%(self.__class__.__name__, self.msgtype, self.event)

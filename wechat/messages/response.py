@@ -3,7 +3,7 @@
 from . import WeChatMessageBase
 
 class WeChatResponse(WeChatMessageBase):
-    _allowed_keys = dict(WeChatMessageBase._allowed_keys, **dict(
+    __slots__ = dict(WeChatMessageBase.__slots__, **dict(
         MsgId=int,
         Content=str,
         PicUrl=str,

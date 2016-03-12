@@ -7,7 +7,7 @@ __all__ = ["WeChatEvent", "WeChatMessage", "WeChatMessageBase", "WeChatRequest",
     "WeChatResponse"]
 
 class WeChatMessageBase(object):
-    _allowed_keys = dict(
+    __slots__ = dict(
         ToUserName=str,
         FromUserName=str,
         CreateTime=int,
@@ -24,7 +24,7 @@ class WeChatMessageBase(object):
             setattr(self, key.lower(), value)
         
     def serialize(self):
-        allowed = self._allowed_keys
+        allowed = self.__slots__
         d = dict()
         for key in allowed:
             if hasattr(self, key.lower()):
@@ -55,12 +55,36 @@ class WeChatMessageBase(object):
             else:
                 params[child.tag.lower()] = child.text
         if params["msgtype"] == "event":
-            from . import WeChatEvent
             message = WeChatEvent(**params)
         else:
-            from . import WeChatMessage
             message = WeChatMessage(**params)
         return message
+        
+    def get(self, key):
+        if hasattr(self, key):
+            return getattr(self, key)
+            
+    def items(self):
+        for key in self.__slots__:
+            if hasattr(self, key):
+                yield (key, getattr(self, key))
+            
+    def __getitem__(self, key):
+        return getattr(self, key)
+        
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+        
+    def __iter__(self):
+        for key in self.__slots__:
+            if hasattr(self, key):
+                yield key
+        
+    def __str__(self):
+        return self.serialize()
+        
+    def __repr__(self):
+        return "<%s %s>"%(self.__class__.__name__, self.msgtype)
 
 from .response import WeChatResponse
 from .request import WeChatRequest
