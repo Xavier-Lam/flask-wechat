@@ -3,7 +3,7 @@
 from . import WeChatRequest
 
 class WeChatEvent(WeChatRequest):
-    __slots__ = dict(WeChatRequest.__slots__, **dict(
+    __fields__ = dict(WeChatRequest.__fields__, **dict(
         Event=str,
         EventKey=str,
         Ticket=str

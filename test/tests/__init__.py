@@ -1,5 +1,6 @@
 #encoding: utf8
 from unittest import TestCase
+# import unittest
 
 __all__ = ["BaseTest", "TestContext"]
 
@@ -19,3 +20,5 @@ class BaseTest(TestCase):
 
     def tearDown(self):
         pass
+  
+from .serialize import SerializeTestCases

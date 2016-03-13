@@ -22,10 +22,17 @@ def accesstoken(id, value):
 
 @app.route("/")
 def home():
-    from wechat import WeChatClient
-    client=WeChatClient(1)
-    raise client
-    return render_template("index.html")
+    a = """<xml>
+<ToUserName><![CDATA[toUser]]></ToUserName>
+<FromUserName><![CDATA[FromUser]]></FromUserName>
+<CreateTime>123456789</CreateTime>
+<MsgType><![CDATA[event]]></MsgType>
+<Event><![CDATA[subscribe]]></Event>
+</xml>"""
+    from wechat.messages import WeChatMessageBase
+    b = WeChatMessageBase.deserialize(a)
+    raise b
+    # return render_template("index.html")
 
 manager = Manager(app)
 

@@ -1,11 +1,42 @@
 #encoding:utf8
 
+import time
 from . import WeChatMessageBase
+from .subelement import SubElement, SubList
 
 class WeChatResponse(WeChatMessageBase):
-    __slots__ = dict(WeChatMessageBase.__slots__, **dict(
-        MsgId=int,
+    __fields__ = dict(WeChatMessageBase.__fields__, **dict(
+        MsgType=str,
         Content=str,
-        PicUrl=str,
-        MediaId=int,
+        Image=SubElement(
+            MediaId=str
+        ),
+        Voice=SubElement(
+            MediaId=str
+        ),
+        Video=SubElement(
+            MediaId=str,
+            Title=str,
+            Description=str,
+        ),
+        Music=SubElement(
+            Title=str,
+            Description=str,
+            MusicURL=str,
+            HQMusicURL=str,
+            ThumbMediaId=str,
+        ),
+        ArticleCount=int,
+        Articles=SubList("item", dict(
+            Title=str,
+            Description=str,
+            PicUrl=str,
+            Url=str
+        ))
     ))
+    
+    def __init__(self, **kwargs):
+        if "msgtype" not in kwargs:
+            raise ValueError("")
+        kwargs["createtime"] = time.time()
+        super(WeChatResponse, self).__init__(**kwargs)

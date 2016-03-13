@@ -3,7 +3,7 @@
 from . import WeChatRequest
 
 class WeChatMessage(WeChatRequest):
-    __slots__ = dict(WeChatRequest.__slots__, **dict(
+    __fields__ = dict(WeChatRequest.__fields__, **dict(
         MsgId=int,
         Content=str,
         PicUrl=str,
