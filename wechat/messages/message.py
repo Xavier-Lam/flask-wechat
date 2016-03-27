@@ -5,6 +5,7 @@ from . import WeChatRequest
 class WeChatMessage(WeChatRequest):
     __fields__ = dict(WeChatRequest.__fields__, **dict(
         MsgId=int,
+        MsgType=str,
         Content=str,
         PicUrl=str,
         MediaId=str,

@@ -20,5 +20,6 @@ class BaseTest(TestCase):
 
     def tearDown(self):
         pass
-  
+
+from .filter import FilterTestCases
 from .serialize import SerializeTestCases
