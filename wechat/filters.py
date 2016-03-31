@@ -2,6 +2,7 @@
 
 from functools import reduce
 import re
+from .messages import WeChatRequest
 
 __all__ = ["all", "and_", "event", "message", "or_"]
 
@@ -39,6 +40,9 @@ class Event(Filter):
             if rv and key:
                 return message.eventkey==key
             return rv
+        # key是message的情况
+        if isinstance(key, WeChatRequest):
+            return self(key, "CLICK")
         return decorated_func
     # 点击跳转
     def view(self, url=None, accuracy=False, ignorecase=False):
@@ -47,6 +51,9 @@ class Event(Filter):
             if rv and url:
                 return _match(message.eventkey, url, accuracy, ignorecase)>=0
             return rv
+        # key是message的情况
+        if isinstance(url, WeChatRequest):
+            return self(url, "VIEW")
         return decorated_func
 
 class Message(Filter):
@@ -57,22 +64,17 @@ class Message(Filter):
         return rv
 
     # 是某种类型的消息
-    typeof = lambda self, t: lambda m: m.msgtype==t
+    typeof = staticmethod(_typeof)
     # 文字消息
     text = staticmethod(_typeof("text"))
-    # text = lambda self, m: self.typeof("text")(m)
     # 图片消息
     image = staticmethod(_typeof("image"))
-    # image = lambda self, m: self.typeof("image")(m)
     # 声音消息
     voice = staticmethod(_typeof("voice"))
-    # voice = lambda self, m: self.typeof("voice")(m)
     # 视频消息
     video = staticmethod(_typeof("video"))
-    # video = lambda self, m: self.typeof("video")(m)
     # 小视频消息
     shortvideo = staticmethod(_typeof("shortvideo"))
-    # shortvideo = lambda self, m: self.typeof("shortvideo")
 
     contains = lambda self, s, i=False:\
         lambda m: self.text() and _match(m.content, s, False, i)>=0
@@ -120,16 +122,3 @@ def or_(*funcs):
 
 event = Event()
 message = Message()
-
-# # 在下列状况中
-# def in_(list, accuracy=False, ignorecase=False):
-#     def func(message):
-#         for item in list:
-#             content = message.content
-#             if ignorecase:
-#                 content = content.lower()
-#                 item = item.lower()
-#             if content.find(item)>=0:
-#                 return True
-#         return False
-#     return _combine_funcs(text, func)

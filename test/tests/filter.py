@@ -30,56 +30,66 @@ class FilterTestCases(BaseTest):
         correct_wrong_case = correct.upper()
         wrong = correct + "111"
         
-        self.assertTrue(filters.event.view()(message))
-        self.assertTrue(filters.event.view(correct)(message))
-        self.assertTrue(filters.event.view(correct_part)(message))
-        self.assertFalse(filters.event.view(wrong)(message))
+        view_filter = filters.event.view
         
-        self.assertFalse(filters.event.view(correct_part, True)(message))
-        self.assertTrue(filters.event.view(correct, True)(message))
-        self.assertFalse(filters.event.view(wrong, True)(message))
+        self.assertTrue(view_filter()(message)==True)
+        self.assertTrue(view_filter(message)==True)
+        self.assertTrue(view_filter(correct)(message)==True)
+        self.assertTrue(view_filter(correct_part)(message)==True)
+        self.assertFalse(view_filter(wrong)(message)==True)
         
-        self.assertTrue(filters.event.view(correct_part_wrong_case,
-            False, True)(message))
-        self.assertTrue(filters.event.view(correct_wrong_case,
-            False, True)(message))
-        self.assertTrue(filters.event.view(correct, False, True)(message))
-        self.assertFalse(filters.event.view(wrong, False, True)(message))
+        self.assertFalse(view_filter(correct_part, True)(message)==True)
+        self.assertTrue(view_filter(correct, True)(message)==True)
+        self.assertFalse(view_filter(wrong, True)(message)==True)
+        
+        self.assertTrue(
+            view_filter(correct_part_wrong_case, False, True)(message)==True)
+        self.assertTrue(
+            view_filter(correct_wrong_case, False, True)(message)==True)
+        self.assertTrue(view_filter(correct, False, True)(message)==True)
+        self.assertFalse(view_filter(wrong, False, True)(message)==True)
             
-        self.assertFalse(filters.event.view(correct_part_wrong_case,
-            False, False)(message))
-        self.assertFalse(filters.event.view(correct_wrong_case,
-            False, False)(message))
-        self.assertTrue(filters.event.view(correct_part,
-            False, False)(message))
-        self.assertTrue(filters.event.view(correct, False, False)(message))
-        self.assertFalse(filters.event.view(wrong, False, False)(message))
+        self.assertFalse(
+            view_filter(correct_part_wrong_case, False, False)(message)==True)
+        self.assertFalse(
+            view_filter(correct_wrong_case, False, False)(message)==True)
+        self.assertTrue(view_filter(correct_part, False, False)(message)==True)
+        self.assertTrue(view_filter(correct, False, False)(message)==True)
+        self.assertFalse(view_filter(wrong, False, False)(message)==True)
             
-        self.assertFalse(filters.event.view(correct_part_wrong_case,
-            True, True)(message))
-        self.assertTrue(filters.event.view(correct_wrong_case,
-            True, True)(message))
-        self.assertFalse(filters.event.view(correct_part,
-            True, True)(message))
-        self.assertTrue(filters.event.view(correct, True, True)(message))
-        self.assertFalse(filters.event.view(wrong, True, True)(message))
+        self.assertFalse(
+            view_filter(correct_part_wrong_case, True, True)(message)==True)
+        self.assertTrue(
+            view_filter(correct_wrong_case, True, True)(message)==True)
+        self.assertFalse(
+            view_filter(correct_part, True, True)(message)==True)
+        self.assertTrue(view_filter(correct, True, True)(message)==True)
+        self.assertFalse(view_filter(wrong, True, True)(message)==True)
             
             
     def test_3_event_click(self):
         message = self.messages["event_click"]
-        self.assertTrue(filters.event.click()(message))
-        self.assertTrue(filters.event.click(self.messages["event_click"].eventkey)\
-            (message))
-        self.assertFalse(filters.event.click(self.messages["event_click"].eventkey + "1")\
-            (message))
+        eventkey = self.messages["event_click"].eventkey
+        self.assertTrue(filters.event.click()(message)==True)
+        self.assertTrue(filters.event.click(message)==True)
+        self.assertTrue(
+            filters.event.click(eventkey)(message)==True)
+        self.assertFalse(
+            filters.event.click(eventkey + "1")(message)==True)
         
     def test_4_message_others(self):
-        self.assertTrue(filters.message.typeof("image")(self.messages["message_pic"]))
-        self.assertTrue(filters.message.image(self.messages["message_pic"]))
-        self.assertFalse(filters.message.image(self.messages["message_voice"]))
-        self.assertTrue(filters.message.voice(self.messages["message_voice"]))
-        self.assertTrue(filters.message.video(self.messages["message_video"]))
-        self.assertTrue(filters.message.shortvideo(self.messages["message_shortvideo"]))
+        self.assertTrue(
+            filters.message.typeof("image")(self.messages["message_pic"])==True)
+        self.assertTrue(
+            filters.message.image(self.messages["message_pic"])==True)
+        self.assertFalse(
+            filters.message.image(self.messages["message_voice"])==True)
+        self.assertTrue(
+            filters.message.voice(self.messages["message_voice"])==True)
+        self.assertTrue(
+            filters.message.video(self.messages["message_video"])==True)
+        self.assertTrue(
+            filters.message.shortvideo(self.messages["message_shortvideo"])==True)
         
     def test_5_message_text(self):
         pass
