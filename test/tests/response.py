@@ -33,11 +33,6 @@ class ResponseTestCases(BaseTest):
 <Event><![CDATA[subscribe]]></Event>
 </xml>""", content_type="text/xml")
         self.__response_match(resp, contains="welcome")
-        # self.assertTrue(resp.status_code==200)
-        # self.assertTrue(resp.mimetype=="text/xml")
-        # data = resp.data.decode("utf8")
-        # self.assertTrue(data.find("welcome"))
-        # self.assertTrue(re.match(self.pattern, data))
         # 图片
         resp = self.app.post(self.posturl, data="""<xml>
  <ToUserName><![CDATA[toUser]]></ToUserName>
@@ -49,11 +44,6 @@ class ResponseTestCases(BaseTest):
  <MsgId>1234567890123456</MsgId>
  </xml>""", content_type="text/xml")
         self.__response_match(resp, contains="image")
-        # self.assertTrue(resp.status_code==200)
-        # self.assertTrue(resp.mimetype=="text/xml")
-        # data = resp.data.decode("utf8")
-        # self.assertTrue(data.find("image"))
-        # self.assertTrue(re.match(self.pattern, data))
         
     def test_2_text(self):
         resp = self.app.post(self.posturl, data="""<xml>
@@ -106,11 +96,6 @@ class ResponseTestCases(BaseTest):
 <MsgId>1234567890123456</MsgId>
 </xml>""", content_type="text/xml")
         self.__response_match(resp, contains="unknown")
-        # self.assertTrue(resp.status_code==200)
-        # self.assertTrue(resp.mimetype=="text/xml")
-        # data = resp.data.decode("utf8")
-        # self.assertTrue(data.find("unknown"))
-        # self.assertTrue(re.match(self.pattern, data))
         # bad request
         resp = self.app.post(self.posturl, data="""<xml>
 <ToUserName><![CDATA[toUser]]></ToUserName>
@@ -127,10 +112,6 @@ class ResponseTestCases(BaseTest):
  <MsgId>1234567890123456</MsgId>
  </xml>""", content_type="text/xml")
         self.__response_match(resp, xml=False)
-        # self.assertTrue(resp.status_code==200, resp.status_code)
-        # self.assertTrue(resp.mimetype=="text/html", resp.mimetype)
-        # data = resp.data.decode("utf8")
-        # self.assertTrue(data=="")
         
     def __response_match(self, resp, status_code=200, xml=True, contains="",
         not_contains=""):
