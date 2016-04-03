@@ -22,7 +22,7 @@ def _patch():
     ElementTree._original_serialize_xml = ElementTree._serialize_xml
     def _serialize_xml(write, elem, qnames, namespaces, *args, **kwargs):
         if elem.tag == "![CDATA[":
-            write("\n<%s%s]]>\n" % (
+            write("\n<%s%s]]>" % (
                     elem.tag, elem.text))
             return
         return ElementTree._original_serialize_xml(
@@ -39,6 +39,7 @@ __all__ = ["WeChat", "wechat_blueprint", "WeChatClient", "WeChatHTTPClient"]
 #region configs
 _default_configs = dict(
     WECHAT_CALLBACK_PREFIX="/wechat/callbacks",
+    WECHAT_DEBUG=False
 );
 
 def _get_app_config(app, key):
@@ -73,11 +74,13 @@ class WeChat(object):
         
     def init_app(self, app):
         self.app = app
+        self.callback_prefix = _get_app_config(app, "WECHAT_CALLBACK_PREFIX")
+        self.debug = _get_app_config(app, "WECHAT_DEBUG")
         app.wechat = self
         wechat_blueprint.core = self
         
         app.register_blueprint(wechat_blueprint, 
-            url_prefix=_get_app_config(app, "WECHAT_CALLBACK_PREFIX"))
+            url_prefix=self.callback_prefix)
 
     #region account configs
     def config_getter(self, func):
@@ -129,6 +132,7 @@ class WeChat(object):
             elif not _callable(filters):
                 raise TypeError("filters must be callable")
 
+            # 覆盖原有handler
             for tuple in self._handlers[identity]:
                 if tuple[0]==filters:
                     del self._handlers[identity][tuple]
@@ -147,12 +151,13 @@ class WeChat(object):
         handler = self.__get_handler(identity, message)
         if not handler:
             return None
-        try:
-            return handler(message)
-        except Exception as e:
-            from .signals import response_error
-            response_error.send(self, e)
-            return None
+        # try:
+        return handler(message)
+        # except Exception as e:
+        #     from .signals import response_error
+        #     response_error.send(self, e)
+        #     if self.debug: raise
+        #     return None
         
     def __get_handler(self, identity, message):
         for filter, handler in self._handlers[identity]:

@@ -40,7 +40,8 @@ class XMLElementBase(object):
             else:
                 ele.text = str(value)
         if return_:
-            return ElementTree.tostring(parent, "unicode", "xml")
+            return ElementTree.tostring(parent, "unicode", "xml")\
+                .replace(">\n<", "><")
            
     @staticmethod
     def deserialize(string):

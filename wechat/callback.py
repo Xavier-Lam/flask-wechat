@@ -26,9 +26,13 @@ def verify(identify):
 @wechat.route("/<identify>/", methods=["POST"])
 def callback(identify):
     response = None
+    message = WeChatMessageBase.deserialize(request.data)
+    if not message:
+        _send_signal("request_badrequest", request.data)
+        abort(400) # 值得商榷
+    _send_signal("request_received", message)
+        
     try:
-        message = WeChatMessageBase.deserialize(request.data)
-        _send_signal("message_received", message)
         # interceptor = wechat.core.get_interceptor("message_received")
         # if interceptor:
         #     message = interceptor(message)
@@ -36,7 +40,9 @@ def callback(identify):
         #     return ""
         response = wechat.core.handle_message(identify, message)
     except Exception as e:
-        _send_signal("message_error", e)
+        _send_signal("request_handle_error", e)
+        if wechat.core.debug: raise
+        return ""
         # interceptor = wechat.core.get_interceptor("message_error")
         # if interceptor:
         #     response = interceptor(message)
@@ -65,6 +71,7 @@ def _send_signal(signal, *args, **kwargs):
     if hasattr(signals, signal):
         send = getattr(signals, signal).send
         send(wechat.core, *args, **kwargs)
+    elif wechat.core.debug: raise KeyError(signal)
 
 def _send_repsonse(response):
     return Response(response.serialize(), mimetype="text/xml")

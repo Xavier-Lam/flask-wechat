@@ -57,16 +57,11 @@ class Event(Filter):
         return decorated_func
 
 class Message(Filter):
-    def __call__(self, message, text=None, ignorecase=False):
-        rv = message.msgtype != "event"
-        if rv and text and self.typeof(message, "text"):
-            return _match(message.content, text, True, ignorecase)
-        return rv
+    def __call__(self, message):
+        return message.msgtype != "event"
 
     # 是某种类型的消息
     typeof = staticmethod(_typeof)
-    # 文字消息
-    text = staticmethod(_typeof("text"))
     # 图片消息
     image = staticmethod(_typeof("image"))
     # 声音消息
@@ -77,10 +72,10 @@ class Message(Filter):
     shortvideo = staticmethod(_typeof("shortvideo"))
 
     contains = lambda self, s, i=False:\
-        lambda m: self.text() and _match(m.content, s, False, i)>=0
+        lambda m: self.text(m) and _match(m.content, s, False, i)>=0
     # 开头
     startswith = lambda self, s, i=False:\
-        lambda m: self.text() and _match(m.content, s, False, i)==0
+        lambda m: self.text(m) and _match(m.content, s, False, i)==0
     # 正则
     regex = lambda self, p, fl=0:\
         lambda m: self.text() and not not re.match(p, m.content, fl)
@@ -104,7 +99,17 @@ class Message(Filter):
                     return True
             return False
         return and_(text, func)
-
+        
+    def text(self, text=None, ignorecase=False):
+        def decorated_func(message):
+            rv = self.typeof("text")(message)
+            if rv and text:
+                return _match(message.content, text, True, ignorecase)>=0
+            return rv
+        if isinstance(text, WeChatRequest):
+            return self.typeof("text")(text)
+        return decorated_func
+        
 # 所有
 all = lambda m: True
 # 满足全部

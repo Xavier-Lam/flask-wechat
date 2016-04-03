@@ -38,7 +38,7 @@ data = dict(
         eventkey="EVENTKEY",
     ),
     message_text=theirsmessage(
-        msgtype="type",
+        msgtype="text",
         content="中文",
         msgid=12345,
     ),

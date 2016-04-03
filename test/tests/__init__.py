@@ -22,4 +22,5 @@ class BaseTest(TestCase):
         pass
 
 from .filter import FilterTestCases
+from .response import ResponseTestCases
 from .serialize import SerializeTestCases

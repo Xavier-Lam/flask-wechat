@@ -1,7 +1,7 @@
 #encoding: utf8
 
 from flask import Flask
-from wechat import filters, WeChat, WeChatResponse
+from wechat import filters, WeChat
 
 app = Flask(__name__)
 
@@ -13,21 +13,25 @@ def get_config(id):
         appid="123"
     ) if id=="tmp" else dict()
 
-@wechat.message_handler("tmp", filters.subscribe)
+@wechat.handler("tmp", filters.event.subscribe)
 def subscribe(message):
-    return quick_response("欢迎关注")
+    return message.reply_text("欢迎关注")
 
-@wechat.message_handler("tmp")
+@wechat.handler("tmp")
 def all(message):
     return message.reply_text("听不懂呢")
 
-@wechat.message_handler("tmp", filters.contains("妈个鸡"))
+@wechat.handler("tmp", filters.message.contains("妈个鸡"))
 def subscribe(message):
     return message.reply_text("草泥马")
 
-@wechat.message_handler("tmp", filters.contains("受不了了"))
+@wechat.handler("tmp", filters.message.contains("受不了了"))
 def subscribe(message):
     return message.reply_text("小妖精 看我不操烂你的逼")
+    
+@wechat.handler("tmp", filters.message.image)
+def image(message):
+    return message.reply_text("不要发图片给我了")
 
 @app.route("/")
 def home():
