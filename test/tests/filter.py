@@ -3,8 +3,8 @@
 from . import BaseTest
 from ..data import data
 
-import wechat.filters as filters 
-from wechat.messages import *
+import flask_wechat.filters as filters 
+from flask_wechat.messages import *
 
 class FilterTestCases(BaseTest):
     messages = dict()

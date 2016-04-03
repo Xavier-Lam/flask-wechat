@@ -5,7 +5,7 @@ import re
 from . import BaseTest
 from ..data import data
 
-from wechat.messages import *
+from flask_wechat.messages import *
 
 class SerializeTestCases(BaseTest):
     messages = dict()

@@ -6,7 +6,7 @@ from . import ClientTest
 from ..app import app, wechat
 from .. import requests 
 
-import wechat.signals as signals
+import flask_wechat.signals as signals
 
 @contextmanager
 def context(signal, app):

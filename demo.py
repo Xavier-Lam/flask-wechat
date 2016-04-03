@@ -1,7 +1,7 @@
 #encoding: utf8
 
 from flask import Flask
-from wechat import filters, signals, WeChat
+from flask_wechat import filters, signals, WeChat
 
 app = Flask(__name__)
 

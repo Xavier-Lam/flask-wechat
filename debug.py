@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask.ext.script import Manager, Shell
-from wechat import filters, WeChat
+from flask_wechat import filters, WeChat
 
 app = Flask(__name__)
 app.debug = True
@@ -29,7 +29,7 @@ def home():
 <MsgType><![CDATA[event]]></MsgType>
 <Event><![CDATA[subscribe]]></Event>
 </xml>"""
-    from wechat.messages import WeChatMessageBase
+    from flask_wechat.messages import WeChatMessageBase
     b = WeChatMessageBase.deserialize(a)
     raise b
     # return render_template("index.html")
@@ -40,7 +40,7 @@ def shell(config):
     """
     run flask shell
     """
-    from wechat import WeChatHTTPClient
+    from flask_wechat import WeChatHTTPClient
     shell = Shell(make_context=lambda: dict(app=app, client=WeChatHTTPClient(1)))
     shell.run(True, False)
     

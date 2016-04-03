@@ -1,7 +1,7 @@
 #encoding: utf8
 
 from flask import Flask
-from wechat import filters, WeChat
+from flask_wechat import filters, WeChat
 
 app = Flask(__name__)
 # app.config["DEBUG"] = True

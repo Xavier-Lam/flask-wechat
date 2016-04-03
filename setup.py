@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
 	name="flask-wechat",
-	packages=["wechat"],
+	packages=["flask_wechat"],
 	version="0.0.1",
 	author="Xavier-Lam",
 	description="a simple flask module implement wechat api",
