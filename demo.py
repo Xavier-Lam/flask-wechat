@@ -10,7 +10,8 @@ wechat = WeChat(app)
 @wechat.config_getter
 def get_config(id):
     return dict(
-        appid="123"
+        appid="123",
+        token="654212"
     ) if id=="tmp" else dict()
 
 @wechat.handler("tmp", filters.event.subscribe)

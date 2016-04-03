@@ -9,29 +9,35 @@ from .services.accesstoken import get_token
 
 @wechat.route("/<identify>/", methods=["GET", "POST"])
 def callback(identify):
-    _send_signal("request_received", identify, request)
+    _send_signal("request_received", identity=identify, 
+        request=request)
     # 验证请求
     signature = request.args.get("signature")
     try:
         timestamp = int(request.args.get("timestamp"))
     except:
-        _send_signal("request_badrequest", request, "incorrect timestamp")
+        _send_signal("request_badrequest", request=request, 
+            message="incorrect timestamp")
         abort(400)
     nonce = request.args.get("nonce")
 
     if not (signature and timestamp and nonce):
-        _send_signal("request_badrequest", request, "incorrect args")
+        _send_signal("request_badrequest", request=request, 
+            message="incorrect args")
         abort(400)
     if abs(time.time() - timestamp) >= 15*60:
-        _send_signal("request_badrequest", request, "incorrect timestamp")
+        _send_signal("request_badrequest", request=request, 
+            message="incorrect timestamp")
         abort(400)
     if not _verify_request(identify, signature, timestamp, nonce):
-        _send_signal("request_badrequest", request, "incorrect signature")
+        _send_signal("request_badrequest", request=request, 
+            message="incorrect signature")
         abort(401)
     if request.method=="GET":
         echostr = request.args.get("echostr")
         if not echostr:
-            _send_signal("request_badrequest", request, "incorrect args")
+            _send_signal("request_badrequest", request=request, 
+            message="incorrect args")
             abort(400)
         return echostr
         
@@ -39,9 +45,10 @@ def callback(identify):
     response = None
     message = WeChatMessageBase.deserialize(request.data)
     if not message:
-        _send_signal("request_badrequest", request, "incorrect content")
+        _send_signal("request_badrequest", request=request, 
+            message="incorrect content")
         abort(400) # 值得商榷
-    _send_signal("request_deserialized", message)
+    _send_signal("request_deserialized", message=message)
         
     try:
         # interceptor = wechat.core.get_interceptor("message_received")
@@ -51,7 +58,8 @@ def callback(identify):
         #     return ""
         response = wechat.core.handle_message(identify, message)
     except Exception as e:
-        _send_signal("request_handle_error", e)
+        _send_signal("request_handle_error", exception=e)
+        _send_signal("response_sent", response="")
         if wechat.core.debug: raise
         return ""
         # interceptor = wechat.core.get_interceptor("message_error")
@@ -60,16 +68,16 @@ def callback(identify):
 
     if isinstance(response, WeChatResponse):
         rv = _send_repsonse(response)
-        _send_signal("response_sent", response)
+        _send_signal("response_sent", response=response)
     else:
         rv = "success"
-        _send_signal("response_sent", "success")
+        _send_signal("response_sent", response="success")
     return rv
 
 def _verify_request(identify, signature, timestamp, nonce):
      account = wechat.core._get_config(identify)
      if not account:
-        _send_signal("verify_failed", 404)
+        _send_signal("request_badrequest", message="identify not found")
         abort(404)
      arr = [account["token"], str(timestamp), nonce]
      arr.sort()
@@ -79,10 +87,9 @@ def _verify_request(identify, signature, timestamp, nonce):
      server_sign = sha1(string.encode()).hexdigest()
      return server_sign == signature
 
-def _send_signal(signal, *args, **kwargs):
+def _send_signal(signal, **kwargs):
     if hasattr(signals, signal):
-        send = getattr(signals, signal).send
-        send(wechat.core, *args, **kwargs)
+        getattr(signals, signal).send(wechat.core, **kwargs)
     elif wechat.core.debug: raise KeyError(signal)
 
 def _send_repsonse(response):
