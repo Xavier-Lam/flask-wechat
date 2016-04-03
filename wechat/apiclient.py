@@ -4,9 +4,9 @@ import requests
 from . import wechat_blueprint as wechat
 from .signals import wechat_error, wechat_servererror
 
-__all__ = ["WeChatHTTPClient"]
+__all__ = ["WeChatApiClient"]
 
-class WeChatHTTPClient(object):
+class WeChatApiClient(object):
     __baseaddr__ = "https://api.weixin.qq.com/cgi-bin"
 
     __accesstoken = None

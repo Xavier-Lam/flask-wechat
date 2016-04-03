@@ -1,8 +1,8 @@
 #encoding:utf8
 
-import requests
-from . import wechat_blueprint as wechat
-from .httpclient import WeChatHTTPClient
+# import requests
+# from . import wechat_blueprint as wechat
+# from .httpclient import WeChatHTTPClient
 
 class WeChatClient(object):
     pass

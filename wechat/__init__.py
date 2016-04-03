@@ -201,5 +201,4 @@ class WeChat(object):
     #endregion
         
 from . import callback
-from .client import WeChatClient
-from .httpclient import WeChatHTTPClient
+from .apiclient import WeChatApiClient
