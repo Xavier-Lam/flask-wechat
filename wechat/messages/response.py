@@ -38,5 +38,5 @@ class WeChatResponse(WeChatMessageBase):
     def __init__(self, **kwargs):
         if "msgtype" not in kwargs:
             raise ValueError("")
-        kwargs["createtime"] = time.time()
+        kwargs["createtime"] = int(time.time())
         super(WeChatResponse, self).__init__(**kwargs)

@@ -94,7 +94,7 @@ class WeChatMessageBase(XMLElementBase):
     )
 
     def __init__(self, **kwargs):
-        self.createtime = kwargs.get("createtime") or time.time
+        self.createtime = kwargs.get("createtime") or int(time.time())
         self.fromusername = kwargs.get("fromusername")
         self.tousername = kwargs.get("tousername")
         self.msgtype = kwargs.get("msgtype")

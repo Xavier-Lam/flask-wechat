@@ -39,6 +39,7 @@ def callback(identify):
             _send_signal("request_badrequest", request=request, 
             message="incorrect args")
             abort(400)
+        _send_signal("response_sent", response=echostr)
         return echostr
         
     # 反序列化body

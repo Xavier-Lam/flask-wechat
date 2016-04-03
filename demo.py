@@ -1,7 +1,7 @@
 #encoding: utf8
 
 from flask import Flask
-from wechat import filters, WeChat
+from wechat import filters, signals, WeChat
 
 app = Flask(__name__)
 
@@ -38,6 +38,12 @@ def image(message):
 def home():
     from flask import render_template
     return render_template("index.html")
+    
+def callback(sender, response):
+    print(response)
+    print("")
+    
+signals.response_sent.connect(callback, wechat)
 
 if __name__ == "__main__":
     app.run(debug=True)
