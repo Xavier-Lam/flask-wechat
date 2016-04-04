@@ -33,6 +33,10 @@ def subscribe(message):
 @wechat.handler("tmp", filters.message.image)
 def image(message):
     return message.reply_text("不要发图片给我了")
+    
+@wechat.handler("tmp", filters.message.contains("黄图"))
+def reply_image(message):
+    return message.reply_media("image", "0oFRnORCwofewx9NkTnuChjoraRtsiCBtR6DTtHVHcbjOeYeNy5mi0EJ7cFRHiqZ")
 
 @app.route("/")
 def home():

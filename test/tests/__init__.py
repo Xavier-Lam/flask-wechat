@@ -49,7 +49,7 @@ class ClientTest(BaseTest):
             sign=sign
         )
 
-# from .apiclient import ApiClientTestCases
+from .apiclient import ApiClientTestCases
 from .filter import FilterTestCases
 from .response import ResponseTestCases
 from .serialize import SerializeTestCases
