@@ -1,2 +1,3 @@
 *.pyc
 demo/*
+docs/_build/*

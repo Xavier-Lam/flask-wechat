@@ -23,37 +23,41 @@ class Filter(object):
         raise NotImplementedError()
 
 class Event(Filter):
-    def __call__(self, message, type=None):
-        rv = message.msgtype == "event"
-        if rv and type:
-            return message.event == type
-        return rv
+    def __call__(self, type=None):
+        def decorated_func(message):
+            rv = message.msgtype == "event"
+            if rv and type:
+                return message.event == type
+            return rv
+        if isinstance(type, WeChatRequest):
+            return message.msgtype == "event"
+        return decorated_func
 
     # 订阅
-    subscribe = lambda self, m: self(m, "subscribe")
+    subscribe = lambda self, m: self("subscribe")(m)
     # 取消订阅
-    unsubscribe = lambda self, m: self(m, "unsubscribe")
+    unsubscribe = lambda self, m: self("unsubscribe")(m)
     # 点击
     def click(self, key=None):
         def decorated_func(message):
-            rv = self(message, "CLICK")
+            rv = self("CLICK")(message)
             if rv and key:
                 return message.eventkey==key
             return rv
         # key是message的情况
         if isinstance(key, WeChatRequest):
-            return self(key, "CLICK")
+            return self("CLICK")(key)
         return decorated_func
     # 点击跳转
     def view(self, url=None, accuracy=False, ignorecase=False):
         def decorated_func(message):
-            rv = self(message, "VIEW")
+            rv = self("VIEW")(message)
             if rv and url:
                 return _match(message.eventkey, url, accuracy, ignorecase)>=0
             return rv
         # key是message的情况
         if isinstance(url, WeChatRequest):
-            return self(url, "VIEW")
+            return self("VIEW")(url)
         return decorated_func
 
 class Message(Filter):
