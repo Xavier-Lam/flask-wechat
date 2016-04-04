@@ -9,7 +9,7 @@ app.debug = True
 
 wechat = WeChat(app)
 
-@wechat.config_getter
+@wechat.account
 def get_config(id):
     return dict(
         appid="wxc908fb07bc49c284",

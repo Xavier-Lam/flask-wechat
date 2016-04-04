@@ -33,7 +33,7 @@ _patch()
 #endregion
 
 
-__all__ = ["WeChat", "wechat_blueprint", "WeChatClient", "WeChatHTTPClient"]
+__all__ = ["WeChat", "wechat_blueprint", "WeChatApiClient"]
 
 
 #region configs
@@ -83,7 +83,7 @@ class WeChat(object):
             url_prefix=self.callback_prefix)
 
     #region account configs
-    def config_getter(self, func):
+    def account(self, func):
         """
         设置获取微信配置的装饰器
         传入配置id 获取app的配置
@@ -103,13 +103,13 @@ class WeChat(object):
     __get_account_config = None
     def _get_config(self, identity):
         if not self.__get_account_config:
-            raise Exception("no config_getters registered")
+            raise RuntimeError("no account function registered")
         return self.__get_account_config(identity)
 
     __accesstoken = None
-    def _accesstoken_maintainer(self, identity, value=""):
+    def _accesstoken_maintainer(self, identity, value="", expires_in=7200):
         if not self.__accesstoken:
-            raise Exception("no accesstoken maintainer registered")
+            raise RuntimeError("no accesstoken maintainer registered")
         return self.__accesstoken(identity, value)
     #endregion
         

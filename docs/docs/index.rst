@@ -15,7 +15,7 @@ Flask-WeChat 微信Flask扩展
 .. toctree::
    :maxdepth: 2
    
-   mini_app   
+   mini_app
    getting_started
    
    filter

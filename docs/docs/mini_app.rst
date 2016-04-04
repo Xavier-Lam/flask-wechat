@@ -19,7 +19,7 @@
 
     wechat = WeChat(app)
 
-    @wechat.config_getter
+    @wechat.account
     def get_config(id):
         return dict(
             appid="appid",

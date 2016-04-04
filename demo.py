@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 wechat = WeChat(app)
 
-@wechat.config_getter
+@wechat.account
 def get_config(id):
     return dict(
         appid="123",

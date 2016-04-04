@@ -3,21 +3,11 @@
 from contextlib import contextmanager
 
 from . import ClientTest
+from .. import requests
 from ..app import app, wechat
-from .. import requests 
+from ..context import signal_context as context
 
 import flask_wechat.signals as signals
-
-@contextmanager
-def context(signal, app):
-    recorded = []
-    def record(sender, **kwargs):
-        recorded.append(kwargs)
-    signal.connect(record, app)
-    try:
-        yield recorded
-    finally:
-        signal.disconnect(record, app)
 
 class SignalTestCases(ClientTest):
     token = "123456"

@@ -30,18 +30,18 @@
 注册获取配置函数
 =================
 
-你需要注册一个获取微信配置用的函数。这个函数使用 ** wechat.config_getter ** 进行装饰。
+你需要注册一个获取微信配置用的函数。这个函数使用 ** wechat.account ** 进行装饰。
 被装饰函数接收一个参数id，使用者通过id辨别不同的公众号。
 函数以字典形式返回该公众号的appid, appsecret, token。如果该id未被用户使用，则返回空字典。
 
 如果你只使用到微信订阅号自动回复功能，你在返回的字典中可以忽略appsecret与appid，
-如果你需要调用微信的API，则你需要返回全部参数。
+如果你需要使用 :ref:`WeChatApiClient` 调用微信的API，则你需要返回全部参数。
 如果你在在公众平台官网的开发者中心处设置了消息加密，则你还需要返回aeskey，
 但目前消息加解密的功能还尚未实现。
 
 .. code-block:: python
 
-    @wechat.config_getter
+    @wechat.account
     def get_config(id):
         return dict(
             appid="appid",
@@ -111,8 +111,8 @@
     import logging
     from flask.ext.wechat import signals
     
-    def callback(sender, identify, **kwargs):
-        logging.info("{identify} sent response: {response}"\
+    def callback(sender, identity, **kwargs):
+        logging.info("{identity} sent response: {response}"\
             .format(identity=identity, response=kwargs["response"]))
     
     signals.response_sent.connect(callback, wechat)
@@ -129,4 +129,66 @@
 请求微信API
 =================
 
-*** 尚未进行单元测试 ***
+微信提供了很多Restful API供开发者调用。通过WeChatApiClient，
+开发者可以方便地调用微信的API。
+
+要使用WeChatApiClient，你需要在@wechat.account装饰的函数返回的字典中包含
+appid与appsecret项。
+
+并且，你需要注册一个维持公众号accesstoken的函数。
+
+.. code-block:: python
+
+    @wechat.accesstoken
+    def accesstoken(identity, value="", expires_in=7200):
+        return "accesstoken"
+        
+这个函数使用@wechat.accesstoken 装饰，
+被装饰的函数包含3个参数，用户定义的公众号id，新的accesstoken值，accesstoken过期时间。
+
+当WeChatApiClient需要获取accesstoken时，会传入用户定义的公众号id，
+你需要返回已知的该公众号accesstoken，如果未知，则返回空。
+
+如果WeChatApiClient更新了accesstoken，会传入用户定义的公众号id，
+新的accesstoken值，新accesstoken的在多久以后过期。
+
+.. note::
+
+    建议用户在数据库或cache中维持这个accesstoken，避免每次请求时都对公众号重新获取授权。
+    
+
+WeChatApiClient 构造函数接受一个参数，用户自定义的公众号id。
+
+.. code-block:: python
+
+    from flask.ext.wechat import WeChatApiClient
+    
+    client = WeChatApiClient("test")
+    
+调用接口时，用户需要传入接口的url以及其他的一些附加参数，
+这些附加参数与python的requests模块一致。可以参见requests模块文档。
+
+WeChatApiClient包含三个请求方法 get, get_raw, post。
+
+.. code-block:: python
+
+    resp, code = client.get("/get_current_selfmenu_info")
+    resp, code = client.post("/menu/create", json=dict(button=[{
+        "type":"view",
+        "name":"搜索",
+        "url":"http://www.soso.com/"
+    }]))
+
+get与post方法返回两个值，第一个值为解析为字典后的返回对象，第二个值为返回中的errcode。
+如果code=0 可以认为请求成功。如果code=-2 则说明请求返回的数据异常，无法正常解析（如不是json）。
+
+.. code-block:: python
+
+    resp = client.get_raw("/get_current_selfmenu_info")
+    
+get_raw 方法直接返回requests.Response 对象。
+
+.. note::
+    
+    WeChatApiClient 会在用户请求的querystring上自动加上accesstoken。
+    当accesstoken过期或是不存在时，WeChatApiClient会尝试更新一次accesstoken。
