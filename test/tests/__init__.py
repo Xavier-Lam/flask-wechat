@@ -25,7 +25,7 @@ class BaseTest(TestCase):
         pass
         
 class ClientTest(BaseTest):
-    identify = "test"
+    identity = "test"
     
     def setUp(self):
         super(ClientTest, self).setUp()

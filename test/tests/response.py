@@ -12,13 +12,13 @@ class ResponseTestCases(ClientTest):
         
     def setUp(self):
         super(ResponseTestCases, self).setUp()
-        app.config["id"] = self.identify
+        app.config["id"] = self.identity
         app.config["token"] = self.token
         # app.config["WECHAT_DEBUG"] = True
         # app.config["DEBUG"] = True
         self.app = app.test_client()
         wechat.init_app(app)
-        self.posturl = wechat.callback_prefix +  "/" + self.identify + "/"
+        self.posturl = wechat.callback_prefix +  "/" + self.identity + "/"
         
     def test_1_verify(self):
         echostr = "aaaaaa"

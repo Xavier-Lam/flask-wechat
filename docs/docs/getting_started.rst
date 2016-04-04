@@ -113,11 +113,11 @@
     
     def callback(sender, identify, **kwargs):
         logging.info("{identify} sent response: {response}"\
-            .format(identify=identify, response=kwargs["response"]))
+            .format(identity=identity, response=kwargs["response"]))
     
     signals.response_sent.connect(callback, wechat)
     
-信号的发送者为WeChat扩展实例，信号将至少接收一个identify参数，暨访问者自定义的公众号id。
+信号的发送者为WeChat扩展实例，信号将至少接收一个identity参数，暨访问者自定义的公众号id。
 在本例中，我们注册了回复已发送的信号。该信号发送于已接收到微信请求，并且成功回复以后。
 不包括微信请求异常（Bad Request）回复的状况，但包含控制器抛出未经处理的异常的状况。
 

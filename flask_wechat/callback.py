@@ -7,49 +7,49 @@ from . import wechat_blueprint as wechat
 from .messages import WeChatMessageBase, WeChatResponse
 from .services.accesstoken import get_token
 
-@wechat.route("/<identify>/", methods=["GET", "POST"])
-def callback(identify):
-    _send_signal("request_received", identity=identify, 
+@wechat.route("/<identity>/", methods=["GET", "POST"])
+def callback(identity):
+    _send_signal("request_received", identity, 
         request=request)
     # 验证请求
     signature = request.args.get("signature")
     try:
         timestamp = int(request.args.get("timestamp"))
     except:
-        _send_signal("request_badrequest", request=request, 
+        _send_signal("request_badrequest", identity, request=request, 
             message="incorrect timestamp")
         abort(400)
     nonce = request.args.get("nonce")
 
     if not (signature and timestamp and nonce):
-        _send_signal("request_badrequest", request=request, 
+        _send_signal("request_badrequest", identity, request=request, 
             message="incorrect args")
         abort(400)
     if abs(time.time() - timestamp) >= 15*60:
-        _send_signal("request_badrequest", request=request, 
+        _send_signal("request_badrequest", identity, request=request, 
             message="incorrect timestamp")
         abort(400)
-    if not _verify_request(identify, signature, timestamp, nonce):
-        _send_signal("request_badrequest", request=request, 
+    if not _verify_request(identity, signature, timestamp, nonce):
+        _send_signal("request_badrequest", identity, request=request, 
             message="incorrect signature")
         abort(401)
     if request.method=="GET":
         echostr = request.args.get("echostr")
         if not echostr:
-            _send_signal("request_badrequest", request=request, 
+            _send_signal("request_badrequest", identity, request=request, 
             message="incorrect args")
             abort(400)
-        _send_signal("response_sent", response=echostr)
+        _send_signal("response_sent", identity, response=echostr)
         return echostr
         
     # 反序列化body
     response = None
     message = WeChatMessageBase.deserialize(request.data)
     if not message:
-        _send_signal("request_badrequest", request=request, 
+        _send_signal("request_badrequest", identity, request=request, 
             message="incorrect content")
         abort(400) # 值得商榷
-    _send_signal("request_deserialized", message=message)
+    _send_signal("request_deserialized", identity, message=message)
         
     try:
         # interceptor = wechat.core.get_interceptor("message_received")
@@ -57,10 +57,10 @@ def callback(identify):
         #     message = interceptor(message)
         # if not isinstance(message, WeChatMessageBase):
         #     return ""
-        response = wechat.core.handle_message(identify, message)
+        response = wechat.core.handle_message(identity, message)
     except Exception as e:
-        _send_signal("request_handle_error", exception=e)
-        _send_signal("response_sent", response="")
+        _send_signal("request_handle_error", identity, exception=e)
+        _send_signal("response_sent", identity, response="")
         if wechat.core.debug: raise
         return ""
         # interceptor = wechat.core.get_interceptor("message_error")
@@ -69,16 +69,16 @@ def callback(identify):
 
     if isinstance(response, WeChatResponse):
         rv = _send_repsonse(response)
-        _send_signal("response_sent", response=response)
+        _send_signal("response_sent", identity, response=response)
     else:
         rv = "success"
-        _send_signal("response_sent", response="success")
+        _send_signal("response_sent", identity, response="success")
     return rv
 
-def _verify_request(identify, signature, timestamp, nonce):
-     account = wechat.core._get_config(identify)
+def _verify_request(identity, signature, timestamp, nonce):
+     account = wechat.core._get_config(identity)
      if not account:
-        _send_signal("request_badrequest", message="identify not found")
+        _send_signal("request_badrequest", identity, message="identity not found")
         abort(404)
      arr = [account["token"], str(timestamp), nonce]
      arr.sort()
@@ -88,9 +88,9 @@ def _verify_request(identify, signature, timestamp, nonce):
      server_sign = sha1(string.encode()).hexdigest()
      return server_sign == signature
 
-def _send_signal(signal, **kwargs):
+def _send_signal(signal, identity, **kwargs):
     if hasattr(signals, signal):
-        getattr(signals, signal).send(wechat.core, **kwargs)
+        getattr(signals, signal).send(wechat.core, identity=identity, **kwargs)
     elif wechat.core.debug: raise KeyError(signal)
 
 def _send_repsonse(response):
