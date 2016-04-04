@@ -3,19 +3,17 @@
 import re
 
 from . import BaseTest
-from ..data import data
+from ..data import data, mine
 
 from flask_wechat.messages import *
+from flask_wechat.messages.subelement import WeChatResponseSubElement, WeChatResponseSubList
 
 class SerializeTestCases(BaseTest):
     messages = dict()
+    mine = dict()
     serialized = dict()
 
     def test_1_init(self):
-        # messages["event_subscribe"] = WeChatMessageEvent(**self.data["event_subscribe"])
-        # messages["event_barcode"] = WeChatMessageEvent(**self.data["event_barcode"])
-        # messages["event_click"] = WeChatMessageEvent(**self.data["event_click"])
-        # messages["event_view"] = WeChatMessageEvent(**self.data["event_view"])
         for message_type, message in data.items():
             if message_type.startswith("event"):
                 self.messages[message_type] = WeChatEvent(**message)
@@ -24,7 +22,13 @@ class SerializeTestCases(BaseTest):
         for message, obj in self.messages.items():
             for key, value in data[message].items():
                 self.assertTrue(obj[key]==value, key)
-
+        # 我发出的消息
+        for message_type, message in mine.items():
+            self.mine[message_type] = WeChatResponse(**message)
+        for message, obj in self.mine.items():
+            for key, value in mine[message].items():
+                self.assertTrue(obj[key]==value, obj[key])
+                
     def test_2_serialize(self):
         pattern = r"^<xml>(?:\s*<([a-zA-Z0-9_]+)>.*?</\1>)+\s*</xml>$"
         for message, obj in self.messages.items():
@@ -34,6 +38,13 @@ class SerializeTestCases(BaseTest):
             error_key = self.__serialized_items(obj, serialized)
             self.assertFalse(error_key, error_key)
             self.serialized[message] = serialized
+        # 我发出的消息
+        for message, obj in self.mine.items():
+            serialized = obj.serialize()
+            self.assertTrue(re.match(pattern, serialized), serialized)
+            # 验证该有的key是否都有了
+            error_key = self.__serialized_items(obj, serialized)
+            self.assertFalse(error_key, error_key)
         
     def test_3_deserialize(self):
         deserialized = dict()
@@ -46,6 +57,7 @@ class SerializeTestCases(BaseTest):
     def __serialized_items(self, message, serialized):
         str_pattern = r"<{name}><![CDATA[{value}]]></{name}>"
         num_pattern = r"<{name}>{value}</{name}>"
+        subelement_content = r"<{name}>(.*?)</{name}>"
         for key, type in message.__fields__.items():
             if hasattr(message, key.lower()):
                 value = getattr(message, key.lower())
@@ -55,4 +67,10 @@ class SerializeTestCases(BaseTest):
                 elif (type==int or type==float) and not serialized.find(
                     num_pattern.format(name=key, value=value))>=0:
                     return key
+                elif issubclass(type, WeChatResponseSubElement):
+                    pattern = subelement_content.format(name=key)
+                    match = re.search(pattern, serialized)
+                    self.assertTrue(match)
+                    group = match.group(1)
+                    self.assertFalse(self.__serialized_items(value, group))
         return ""   

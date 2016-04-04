@@ -49,6 +49,9 @@
             token="token"
         ) if id=="demo" else dict()
         
+模块默认的回调地址是/wechat/callbacks/<id>/ ，开发者需将这个地址填入微信后台的回调地址。
+这个值的修改可在 :ref:`config` 中进行。
+        
     
 注册消息处理器
 =================
@@ -76,7 +79,10 @@
     @wechat.handler("demo", 
         [filters.message.startswith("hello"), filters.message.contains("world")])
 
-被装饰函数接收一个参数:ref:`WeChatRequest`对象，返回一个:ref:`WeChatResponse`对象。
+被装饰函数接收一个参数 :ref:`WeChatRequest` 对象，返回一个 :ref:`WeChatResponse` 对象。
+
+WeChatRequest对象的属性包含微信公众平台开发者文档中该微信请求的所有有效字段。
+所有属性为全部小写。WeChatResponse对象同理。
 
 .. warning::
 

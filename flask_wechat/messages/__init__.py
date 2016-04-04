@@ -4,45 +4,42 @@ import time
 from xml.etree import ElementTree
 
 __all__ = ["WeChatEvent", "WeChatMessage", "WeChatMessageBase", "WeChatRequest",
-    "WeChatResponse"]
+    "WeChatResponse", "XMLElementBase"]
     
 class XMLElementBase(object):
     __fields__ = dict()
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
-            if isinstance(value, list):
-                value = WeChatResponseSubList(value)
-            elif isinstance(value, dict):
-                value = WeChatResponseSubElement(value)
+            if isinstance(value, list) or isinstance(value, dict):
+                value = self._get_key_type(key)(value)
             elif isinstance(value, str):
                 value = value.strip()
             setattr(self, key.lower(), value)
 
-    def serialize(self, parent=None, return_=True):
+    def serialize(self, parent=None):
         d = dict()
         for key in self.__fields__:
             if hasattr(self, key.lower()):
                 value = getattr(self, key.lower())
                 if value!=None and isinstance(value, self.__fields__[key]):
                     d[key] = value
-                    
-        if not parent:
-            parent = ElementTree.Element("xml")
+        
+        rv = ""
         for key, value in d.items():
-            ele = ElementTree.SubElement(parent, key)
+            rv += "<" + key + ">"
             if isinstance(value, str):
-                ele.append(ElementTree.CDATA(value))
+                rv += "<![CDATA[" + value + "]]>"
             elif isinstance(value, WeChatResponseSubElement):
-                value.serialize(ele, False)
+                rv += value.serialize(self)
             elif isinstance(value, WeChatResponseSubList):
-                value.serialize(ele, False)
+                rv += value.serialize(self)
             else:
-                ele.text = str(value)
-        if return_:
-            return ElementTree.tostring(parent, "unicode", "xml")\
-                .replace(">\n<", "><")
-           
+                rv += str(value)
+            rv += "</" + key + ">"
+        
+        return ("<xml>" + rv + "</xml>") if not parent else rv
+        
     @staticmethod
     def deserialize(string):
         try:
@@ -69,6 +66,12 @@ class XMLElementBase(object):
         for key in self.__fields__:
             if hasattr(self, key):
                 yield (key, getattr(self, key))
+                
+    def _get_key_type(self, key):
+        """根据key获取这个key的具体类型"""
+        for k in self.__fields__:
+            if k.lower()==key:
+                return self.__fields__[k]
             
     def __getitem__(self, key):
         return getattr(self, key)

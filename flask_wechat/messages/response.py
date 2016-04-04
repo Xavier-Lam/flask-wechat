@@ -5,6 +5,15 @@ from . import WeChatMessageBase
 from .subelement import SubElement, SubList
 
 class WeChatResponse(WeChatMessageBase):
+    """A response to wechat
+    
+    Handlers return a WeChatResponse instance.
+    
+    :param \*\*kwargs: keyword arguments passed on to the response.
+                       keys can be any key to lowercase in __fields__,
+                       and must contains msgtype.
+    """
+
     __fields__ = dict(WeChatMessageBase.__fields__, **dict(
         MsgType=str,
         Content=str,
@@ -38,5 +47,6 @@ class WeChatResponse(WeChatMessageBase):
     def __init__(self, **kwargs):
         if "msgtype" not in kwargs:
             raise ValueError("")
-        kwargs["createtime"] = int(time.time())
+        if "createtime" not in kwargs:
+            kwargs["createtime"] = int(time.time())
         super(WeChatResponse, self).__init__(**kwargs)

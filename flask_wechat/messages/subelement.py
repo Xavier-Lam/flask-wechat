@@ -2,17 +2,22 @@
 
 from xml.etree import ElementTree
 
-class WeChatResponseSubElement(dict):
-    pass
+from . import XMLElementBase
+
+class WeChatResponseSubElement(dict, XMLElementBase):
+    def __init__(self, d):
+        super(WeChatResponseSubElement, self).__init__(d)
+        for k, v in d.items():
+            setattr(self, k, v)
     
-class WeChatResponseSubList(list):
-    def serialize(self, parent, return_=False):
+class WeChatResponseSubList(list, XMLElementBase):
+    def serialize(self, parent):
         cls = SubElement(**self.__fields__)
+        rv = "<" + self.__tag__ + ">"
         for item in self:
-            ele = ElementTree.SubElement(parent, self.__tag__)
-            cls(item).serialize(ele, False)
-        if return_:
-            return ElementTree.tostring(parent, "unicode", "xml")
+            rv += cls(item).serialize(ele)
+        rv += "</" + self.__tag__ + ">"
+        return rv
 
 def SubElement(**fields):
     return type("WeChatResponseSubElement", 

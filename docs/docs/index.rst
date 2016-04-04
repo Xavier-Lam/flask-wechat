@@ -19,6 +19,10 @@ Flask-WeChat 微信Flask扩展
    getting_started
    
    filter
+   
+   config
+   
+   api
 
 
 Indices and tables

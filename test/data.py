@@ -89,3 +89,24 @@ data = dict(
         msgid=1232131
     ),
 )
+
+mine=dict(
+    message_text=minemessage(
+        msgtype="text",
+        content="卧槽",
+    ),
+    message_image=minemessage(
+        msgtype="image",
+        image=dict(
+            mediaid="2111"
+        )
+    ),
+    message_video=minemessage(
+        msgtype="video",
+        video=dict(
+            mediaid="1221",
+            title="标题",
+            description="描述"
+        )
+    )
+)

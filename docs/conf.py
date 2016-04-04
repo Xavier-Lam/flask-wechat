@@ -29,7 +29,7 @@ import os
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -49,6 +49,10 @@ master_doc = 'docs/index'
 project = 'Flask-WeChat'
 copyright = '2016, Xavier-Lam'
 author = 'Xavier-Lam'
+
+module_path = os.path.join(os.path.dirname(__file__), '..')
+module_path = os.path.abspath(module_path)
+sys.path.insert(0, module_path)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

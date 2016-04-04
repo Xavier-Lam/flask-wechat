@@ -1,3 +1,6 @@
 *.pyc
 demo/*
 docs/_build/*
+.vs/*
+*.sln
+*.pyproj
