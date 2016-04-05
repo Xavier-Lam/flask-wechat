@@ -43,7 +43,7 @@ class WeChatRequest(WeChatMessageBase):
         """
         if isinstance(articles, dict):
             articles = [articles]
-        return self.reply(type, articlecount=len(articles), articles=articles)
+        return self.reply("news", articlecount=len(articles), articles=articles)
 
     def reply(self, type, **kwargs):
         """A short cut to reply a message

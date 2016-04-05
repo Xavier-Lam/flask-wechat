@@ -68,12 +68,13 @@ def callback(sender, identity, response):
     print(response)
     
 def request_callback(sender, identity, message, **kwargs):
-    from flask_wechat import WeChatMessage
+    from flask_wechat.messages import WeChatMessage
     if isinstance(message, WeChatMessage) and message.msgtype == "location":
         print("")
         print(message)
     
 signals.response_sent.connect(callback, wechat)
+signals.request_deserialized.connect(callback, wechat)
 
 if __name__ == "__main__":
     app.run(debug=True)

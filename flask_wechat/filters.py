@@ -118,8 +118,8 @@ class Message(Filter):
     def location(self, longitude, latitude, range):
         def decorated_func(message):
             if self.typeof("location")(message):
-                return (pow(abs(message.location_x-longitude), 2) +
-                    pow(abs(message.location_y-latitude), 2)) < pow(range, 2)
+                return (pow(abs(message.location_x-latitude), 2) +
+                    pow(abs(message.location_y-longitude), 2)) < pow(range, 2)
             return False
         return decorated_func
         

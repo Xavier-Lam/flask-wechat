@@ -80,9 +80,9 @@ class FilterTestCases(BaseTest):
     def test_4_message_location(self):
         message = self.messages["message_location"]
         self.assertFalse(filters.message.location(
-            message.location_x+1, message.location_y+1, 1)(message)==True)
+            message.location_y+1, message.location_x+1, 1)(message)==True)
         self.assertTrue(filters.message.location(
-            message.location_x+1, message.location_y+1, 2)(message)==True)
+            message.location_y+1, message.location_x+1, 2)(message)==True)
         
     def test_5_message_text(self):
         pass
