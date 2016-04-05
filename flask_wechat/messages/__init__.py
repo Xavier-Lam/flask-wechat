@@ -11,10 +11,7 @@ class XMLElementBase(object):
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
-            if isinstance(value, list) or isinstance(value, dict):
-                value = self._get_key_type(key)(value)
-            elif isinstance(value, str):
-                value = value.strip()
+            value = self._get_key_type(key)(value)
             setattr(self, key.lower(), value)
 
     def serialize(self, parent=None):

@@ -41,7 +41,7 @@ class WeChatRequest(WeChatMessageBase):
         
         :param articles: a list of article or a article dict
         """
-        if isintance(articles, dict):
+        if isinstance(articles, dict):
             articles = [articles]
         return self.reply(type, articlecount=len(articles), articles=articles)
 
