@@ -1,10 +1,12 @@
 #encoding:utf8
 
-import json
+import json, sys
 
 import requests
 from . import wechat_blueprint as wechat
 from .signals import wechat_granted, wechat_error, wechat_servererror
+
+__python_version__ = sys.version[0]
 
 __all__ = ["WeChatApiClient"]
 
@@ -65,7 +67,9 @@ class WeChatApiClient(object):
             headers["Content-Type"] = "application/json; charset=UTF-8"
             headers["Encoding"] = "utf-8"
             kwargs["headers"] = headers
-            kwargs["data"] = json.dumps(kwargs["json"], ensure_ascii=False).encode("utf8")
+            kwargs["data"] = json.dumps(kwargs["json"], ensure_ascii=False)
+            if __python_version__ == "3":
+                kwargs["data"] = kwargs["data"].encode("utf-8")
             del kwargs["json"]
         return getattr(requests, method)(url, *args, **kwargs)
 

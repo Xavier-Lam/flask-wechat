@@ -9,30 +9,6 @@ from flask import Blueprint
 from .filters import all as filter_all
 from .filters import and_
 
-
-#region patch
-def _patch():
-    def CDATA(text=None):
-        element = ElementTree.Element("![CDATA[")
-        element.text = text
-        return element
-
-    ElementTree.CDATA = CDATA
-
-    ElementTree._original_serialize_xml = ElementTree._serialize_xml
-    def _serialize_xml(write, elem, qnames, namespaces, *args, **kwargs):
-        if elem.tag == "![CDATA[":
-            write("\n<%s%s]]>" % (
-                    elem.tag, elem.text))
-            return
-        return ElementTree._original_serialize_xml(
-            write, elem, qnames, namespaces, *args, **kwargs)
-    ElementTree._serialize_xml = ElementTree._serialize['xml'] = _serialize_xml
-
-_patch()
-#endregion
-
-
 __all__ = ["WeChat", "wechat_blueprint", "WeChatApiClient"]
 
 
@@ -121,27 +97,27 @@ class WeChat(object):
         传入配置id 与filter 其中filter接收一个WeChatMessageBase类型传参
         """
         def decorator(func):
-            nonlocal filters
-            if not filters:
-                filters = filter_all
-            elif isinstance(filters, list):
-                if len(list(filter(lambda f: not _callable(f), filters))):
+            filters_ = filters
+            if not filters_:
+                filters_ = filter_all
+            elif isinstance(filters_, list):
+                if len(list(filter(lambda f: not _callable(f), filters_))):
                     raise TypeError("filters must be callable")
                 # 合并过滤器
-                filters = and_(filters)
-            elif not _callable(filters):
+                filters_ = and_(filters_)
+            elif not _callable(filters_):
                 raise TypeError("filters must be callable")
 
             # 覆盖原有handler
             for tuple in self._handlers[identity]:
-                if tuple[0]==filters:
+                if tuple[0]==filters_:
                     del self._handlers[identity][tuple]
                     break
 
-            if filters==filter_all:
-                self._handlers[identity].append((filters, func))
+            if filters_==filter_all:
+                self._handlers[identity].append((filters_, func))
             else:
-                self._handlers[identity].insert(0, (filters, func))
+                self._handlers[identity].insert(0, (filters_, func))
             return func
 
         return decorator
