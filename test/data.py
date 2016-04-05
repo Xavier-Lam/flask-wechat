@@ -108,5 +108,20 @@ mine=dict(
             title="标题",
             description="描述"
         )
+    ),
+    message_article=minemessage(
+        msgtype="article",
+        articlecount=2,
+        articles=[{
+            "title": "title1",
+            "description": "description",
+            "picurl": "picurl",
+            "url": "url",
+        }, {
+            "title": "title2",
+            "description": "description",
+            "picurl": "picurl",
+            "url": "url",
+        }]
     )
 )

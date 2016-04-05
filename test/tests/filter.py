@@ -76,8 +76,18 @@ class FilterTestCases(BaseTest):
             filters.event.click(eventkey)(message)==True)
         self.assertFalse(
             filters.event.click(eventkey + "1")(message)==True)
+            
+    def test_4_message_location(self):
+        message = self.messages["message_location"]
+        self.assertFalse(filters.message.location(
+            message.location_x+1, message.location_y+1, 1)(message)==True)
+        self.assertTrue(filters.message.location(
+            message.location_x+1, message.location_y+1, 2)(message)==True)
         
-    def test_4_message_others(self):
+    def test_5_message_text(self):
+        pass
+        
+    def test_6_message_others(self):
         self.assertTrue(
             filters.message.typeof("image")(self.messages["message_pic"])==True)
         self.assertTrue(
@@ -91,10 +101,7 @@ class FilterTestCases(BaseTest):
         self.assertTrue(
             filters.message.shortvideo(self.messages["message_shortvideo"])==True)
         
-    def test_5_message_text(self):
-        pass
-        
-    def test_6_common_filter(self):
+    def test_7_common_filter(self):
         t = lambda m: True
         f = lambda m: False
         m = self.messages["event_click"]

@@ -11,12 +11,17 @@ class WeChatResponseSubElement(dict, XMLElementBase):
             setattr(self, k, v)
     
 class WeChatResponseSubList(list, XMLElementBase):
-    def serialize(self, parent):
+    def __init__(self, l):
         cls = SubElement(**self.__fields__)
-        rv = "<" + self.__tag__ + ">"
+        new_list = [cls(item) for item in l]
+        super(WeChatResponseSubList, self).__init__(new_list)
+            
+    def serialize(self, parent=None):
+        rv = ""
         for item in self:
-            rv += cls(item).serialize(ele)
-        rv += "</" + self.__tag__ + ">"
+            rv += "<" + self.__tag__ + ">"
+            rv += item.serialize(self)
+            rv += "</" + self.__tag__ + ">"
         return rv
 
 def SubElement(**fields):

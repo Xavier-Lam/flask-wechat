@@ -11,7 +11,8 @@ __python_version__ = sys.version[0]
 __all__ = ["WeChatApiClient"]
 
 class WeChatApiClient(object):
-    __baseaddr__ = "https://api.weixin.qq.com/cgi-bin"
+    __baseaddr__ = "https://api.weixin.qq.com"
+    __prefix__ = "/cgi-bin"
 
     __accesstoken = None
 
@@ -60,7 +61,7 @@ class WeChatApiClient(object):
         return self.__accesstoken
 
     def requests(self, method, url, *args, **kwargs):
-        url = self.__baseaddr__ + url
+        url = self.__baseaddr__.rstrip("/") + self.__prefix__ + url
         if "json" in kwargs:
             # 解决中文被转码问题
             headers = kwargs.get("headers") or {}

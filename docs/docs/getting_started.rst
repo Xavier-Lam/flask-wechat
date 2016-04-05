@@ -174,6 +174,11 @@ WeChatApiClient 构造函数接受一个参数，用户自定义的公众号id�
 调用接口时，用户需要传入接口的url以及其他的一些附加参数，
 这些附加参数与python的requests模块一致。可以参见requests模块文档。
 
+.. note:: 
+
+    接口url默认为 https://api.weixin.qq.com/ ，前缀/cgi_bin 。
+    如果你需要修改url地址，可以通过修改client的 __baseaddr__ 属性和 __prefix__ 属性来实现。
+
 WeChatApiClient包含三个请求方法 get, get_raw, post。
 
 .. code-block:: python

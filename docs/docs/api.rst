@@ -18,6 +18,8 @@ WeChatRequest
     
     .. automethod:: reply_media
     
+    .. automethod:: reply_article
+    
     .. automethod:: reply
     
     

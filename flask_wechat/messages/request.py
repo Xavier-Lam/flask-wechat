@@ -21,7 +21,7 @@ class WeChatRequest(WeChatMessageBase):
     def reply_media(self, type, media_id, **kwargs):
         """A short cut to reply media message.
         
-        This method can create a media WeChatResponse class  automaticly.
+        This method can create a media WeChatResponse class automaticly.
         Including image/voice/video
         
         :param type: media type including image/voice/video
@@ -35,6 +35,15 @@ class WeChatRequest(WeChatMessageBase):
         media = kwargs or {}
         media["mediaid"] = media_id
         return self.reply(type, **{type: media})
+        
+    def reply_article(self, articles):
+        """A short cut to reply articles
+        
+        :param articles: a list of article or a article dict
+        """
+        if isintance(articles, dict):
+            articles = [articles]
+        return self.reply(type, articlecount=len(articles), articles=articles)
 
     def reply(self, type, **kwargs):
         """A short cut to reply a message

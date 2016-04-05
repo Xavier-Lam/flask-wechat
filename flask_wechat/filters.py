@@ -114,6 +114,15 @@ class Message(Filter):
             return self.typeof("text")(text)
         return decorated_func
         
+    # 在区域内
+    def location(self, longitude, latitude, range):
+        def decorated_func(message):
+            if self.typeof("location")(message):
+                return (pow(abs(message.location_x-longitude), 2) +
+                    pow(abs(message.location_y-latitude), 2)) < pow(range, 2)
+            return False
+        return decorated_func
+        
 # 所有
 all = lambda m: True
 # 满足全部

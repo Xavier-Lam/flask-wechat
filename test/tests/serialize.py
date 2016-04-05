@@ -58,6 +58,8 @@ class SerializeTestCases(BaseTest):
         str_pattern = r"<{name}><![CDATA[{value}]]></{name}>"
         num_pattern = r"<{name}>{value}</{name}>"
         subelement_content = r"<{name}>(.*?)</{name}>"
+        sublist_pattern = r"<{name}>({inside}+)</{name}>"
+        inside_pattern = r"<{tag}>.*?</{tag}>"
         for key, type in message.__fields__.items():
             if hasattr(message, key.lower()):
                 value = getattr(message, key.lower())
@@ -73,4 +75,10 @@ class SerializeTestCases(BaseTest):
                     self.assertTrue(match)
                     group = match.group(1)
                     self.assertFalse(self.__serialized_items(value, group))
-        return ""   
+                elif issubclass(type, WeChatResponseSubList):
+                    inside = inside_pattern.format(tag=value.__tag__)
+                    pattern = sublist_pattern.format(name=key, inside=inside)
+                    match = re.search(pattern, serialized)
+                    self.assertTrue(match)
+                    pass
+        return ""

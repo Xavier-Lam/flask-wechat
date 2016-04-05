@@ -22,7 +22,7 @@ class WeChatMessage(WeChatRequest):
     ))
     
     def __init__(self, **kwargs):
-        if "msgid" not in kwargs:
+        if "msgid" not in kwargs or "msgtype" not in kwargs:
             raise ValueError("message must contains msgid")
         super(WeChatMessage, self).__init__(**kwargs)
         
