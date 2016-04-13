@@ -47,8 +47,9 @@ class WeChatApiClient(object):
             params=params)
         try:
             json = resp.json()
-            if json.get("errcode"):
-                self.__send_signal(wechat_error, resp)
+            code = json.get("errcode")
+            if code:
+                self.__send_signal(wechat_error, resp, code=code)
             else:
                 self.__accesstoken = json["access_token"]
                 # 更新外部token
@@ -57,7 +58,7 @@ class WeChatApiClient(object):
                 self.__send_signal(wechat_granted, resp, 
                     accesstoken=self.__accesstoken, expires_in=expires_in)
         except Exception as e:
-            self.__send_signal(wechat_servererror, resp)
+            self.__send_signal(wechat_servererror, resp, exception=e)
         return self.__accesstoken
 
     def requests(self, method, url, *args, **kwargs):
@@ -90,13 +91,13 @@ class WeChatApiClient(object):
             rv = (json, code)
             if code:
                 # 处理异常
-                self.__send_signal(wechat_error, resp)
+                self.__send_signal(wechat_error, resp, code=code)
                 resp = self._handleerror(json, code)
                 if resp:
                     json = resp.json()
                     code = json.get("errcode") or 0
                     if code:
-                        self.__send_signal(wechat_error, resp)
+                        self.__send_signal(wechat_error, resp, code=code)
                     else:
                         # 成功处理
                         rv = (json, code)

@@ -26,7 +26,7 @@ def callback(identity):
         abort(400)
     if abs(time.time() - timestamp) >= 15*60:
         _send_signal("request_badrequest", identity, request=request, 
-            message="incorrect timestamp")
+            message="incorrect time")
         abort(400)
     if not _verify_request(identity, signature, timestamp, nonce):
         _send_signal("request_badrequest", identity, request=request, 
@@ -38,7 +38,7 @@ def callback(identity):
             _send_signal("request_badrequest", identity, request=request, 
             message="incorrect args")
             abort(400)
-        _send_signal("response_sent", identity, response=echostr)
+        _send_signal("response_sent", identity, request=request, response=echostr)
         return echostr
         
     # 反序列化body
@@ -58,8 +58,9 @@ def callback(identity):
         #     return ""
         response = wechat.core.handle_message(identity, message)
     except Exception as e:
-        _send_signal("request_handle_error", identity, exception=e)
-        _send_signal("response_sent", identity, response="")
+        _send_signal("request_handle_error", identity, request=request,
+            exception=e)
+        _send_signal("response_sent", identity, request=request, response="")
         if wechat.core.debug: raise
         return ""
         # interceptor = wechat.core.get_interceptor("message_error")
@@ -68,10 +69,10 @@ def callback(identity):
 
     if isinstance(response, WeChatResponse):
         rv = _send_repsonse(response)
-        _send_signal("response_sent", identity, response=response)
+        _send_signal("response_sent", identity, request=request, response=response)
     else:
         rv = "success"
-        _send_signal("response_sent", identity, response="success")
+        _send_signal("response_sent", identity, request=request, response="success")
     return rv
 
 def _verify_request(identity, signature, timestamp, nonce):

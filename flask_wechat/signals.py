@@ -11,10 +11,10 @@ signals = Namespace()
 request_received = signals.signal("request_received")
 request_deserialized = signals.signal("request_deserialized")
 request_badrequest = signals.signal("request_badrequest")
-request_deserialize_error = signals.signal("request_deserialize_error")
+# request_deserialize_error = signals.signal("request_deserialize_error")
 request_handle_error = signals.signal("request_handle_error")
 
-response_error = signals.signal("response_error")
+# response_error = signals.signal("response_error")
 response_sent = signals.signal("response_sent")
 
 wechat_granted = signals.signal("wechat_granted")

@@ -19,6 +19,7 @@ Flask-WeChat 微信Flask扩展
    getting_started
    
    filter
+   signal
    
    config
    
