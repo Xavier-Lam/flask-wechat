@@ -35,7 +35,7 @@ setup(
 	version="0.1.0",
 	author="Xavier-Lam",
     author_email="lam.xavier@hotmail.com",
-	description="a simple flask module implement wechat api",
+	description="a simple flask extension for setup wechat service.",
 	url="https://github.com/Xavier-Lam/flask-wechat",
 	install_requires=[
 		"Flask==0.10.1",
@@ -49,10 +49,11 @@ setup(
 	keywords=["flask", "wechat", "weixin", "micromessage"],
 	classifiers=[
 		"Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
 		"Programming Language :: Python :: 3",
-		"Programming Language :: Python :: 3 :: Only",
 		"Programming Language :: Python :: Implementation",
-		"Development Status :: 1 - Planning",
+		"Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
 		"Framework :: Flask",
 		"Intended Audience :: Developers",
