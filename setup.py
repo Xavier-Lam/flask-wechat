@@ -32,7 +32,7 @@ class DocCommand(Command):
 setup(
 	name="Flask-WeChat",
 	packages=["flask_wechat"],
-	version="0.0.2",
+	version="0.1.0",
 	author="Xavier-Lam",
     author_email="lam.xavier@hotmail.com",
 	description="a simple flask module implement wechat api",
