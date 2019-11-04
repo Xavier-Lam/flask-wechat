@@ -39,7 +39,7 @@ setup(
 	url="https://github.com/Xavier-Lam/flask-wechat",
 	install_requires=[
 		"Flask==0.10.1",
-		"requests==2.9.1",
+		"requests==2.20.0",
 	],
     tests_require=["blinker"],
     cmdclass = {
