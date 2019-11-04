@@ -38,7 +38,7 @@ setup(
 	description="a simple flask extension for setup wechat service.",
 	url="https://github.com/Xavier-Lam/flask-wechat",
 	install_requires=[
-		"Flask==0.10.1",
+		"Flask==1.0",
 		"requests==2.9.1",
 	],
     tests_require=["blinker"],
